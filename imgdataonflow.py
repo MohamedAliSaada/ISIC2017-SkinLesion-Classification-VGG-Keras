@@ -30,6 +30,7 @@ class FlexibleHFImageGenerator(Sequence):
             - 'double': original + augmented (batch_size * 2)
         target_size: (H, W) for resizing images
         """
+        super().__init__(**kwargs)  # Important for compatibility
         assert mode in ["none", "augment", "double"], "mode must be 'none', 'augment', or 'double'"
         
         self.dataset = hf_dataset
