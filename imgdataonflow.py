@@ -16,7 +16,7 @@ data_gen =  ImageDataGenerator(
 
 
 class FlexibleHFImageGenerator(Sequence):
-    def __init__(self, hf_dataset, image_key="img", label_key="label", 
+    def __init__(self, hf_dataset, image_key="img", label_key="label",
                  batch_size=32, shuffle=True, mode="none", target_size=None):
         """
         hf_dataset: Hugging Face dataset split
@@ -30,9 +30,9 @@ class FlexibleHFImageGenerator(Sequence):
             - 'double': original + augmented (batch_size * 2)
         target_size: (H, W) for resizing images
         """
-        super().__init__(**kwargs)  # Important for compatibility
+        super().__init__()  # Important for compatibility
         assert mode in ["none", "augment", "double"], "mode must be 'none', 'augment', or 'double'"
-        
+
         self.dataset = hf_dataset
         self.image_key = image_key
         self.label_key = label_key
@@ -47,10 +47,18 @@ class FlexibleHFImageGenerator(Sequence):
         """Number of batches per epoch"""
         return int(np.ceil(len(self.dataset) / self.batch_size))
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx):  #this pass by fit to get batchs 0,1,2,3 and so on  
         """Generate one batch"""
-        batch_indexes = self.indexes[idx * self.batch_size:(idx + 1) * self.batch_size]
-        
+
+        #batch_indexes = self.indexes[idx * self.batch_size:(idx + 1) * self.batch_size]
+        #or safly use :
+        start = idx * self.batch_size
+        end = min((idx + 1) * self.batch_size, len(self.indexes)) #so if he get 0-128 but i have only 100 , he handel this correctly .
+        batch_indexes = self.indexes[start:end]
+
+        if len(batch_indexes) == 0:
+          raise IndexError(f"Empty batch generated at idx={idx}")
+
         images = []
         labels = []
 
@@ -65,14 +73,14 @@ class FlexibleHFImageGenerator(Sequence):
                 raise ValueError("Unsupported image format")
 
             # Resize if needed
-            # you can make any extra enhancement here also not resize only 
+            # you can make any extra enhancement here also not resize only
             if self.target_size:
                 image = image.resize(self.target_size)
-            
+
             #Standard scaling
             image_np = np.array(image).astype(np.float32) / 255.0  # Standard scaling
 
-            image_np = np.array(image)
+            
             images.append(image_np)
             labels.append(example[self.label_key])
 
@@ -81,13 +89,13 @@ class FlexibleHFImageGenerator(Sequence):
 
         if self.mode == "none":
             return images, labels
-        
+
         elif self.mode == "augment":
-            images_aug = next(data_gen.flow(images, batch_size=self.batch_size, shuffle=False))
+            images_aug = next(data_gen.flow(images, batch_size=images.shape[0], shuffle=False))
             return images_aug, labels
 
         elif self.mode == "double":
-            images_aug = next(data_gen.flow(images, batch_size=self.batch_size, shuffle=False))
+            images_aug = next(data_gen.flow(images, batch_size=images.shape[0], shuffle=False))
             images_combined = np.concatenate([images, images_aug], axis=0)
             labels_combined = np.concatenate([labels, labels], axis=0)
             return images_combined, labels_combined
