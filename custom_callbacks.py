@@ -19,7 +19,7 @@ class custom_callback(Callback):
     self.train_gen=train_gen
     self.val_gen=val_gen
 
-  def computer_Y_Y(self ,generator ):
+  def compute_metrics(self ,generator ):
     y_pred=[]
     y_true=[]
     for batch_x , batch_y in generator:
@@ -32,9 +32,9 @@ class custom_callback(Callback):
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
 
-    precision = precision_score(y_true, y_pred, average='macro')
-    recall = recall_score(y_true, y_pred, average='macro')
-    f1 = f1_score(y_true, y_pred, average='macro')
+    precision = precision_score(y_true, y_pred, average='macro', zero_division=0)
+    recall = recall_score(y_true, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_true, y_pred, average='macro', zero_division=0)
 
     return precision, recall, f1
 
@@ -52,5 +52,3 @@ class custom_callback(Callback):
             print(f"Validation -> Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}")
 
         print("------------------------------\n")
-
-my_callback = custom_callback(ds_t,ds_v)
