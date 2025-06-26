@@ -1,6 +1,7 @@
 from tensorflow.keras.callbacks import EarlyStopping , Callback
 from sklearn.metrics import precision_score, recall_score, f1_score
 import numpy as np
+import sys
 
 early_stopping =  EarlyStopping(
     monitor="val_loss",
@@ -39,6 +40,7 @@ class custom_callback(Callback):
     return precision, recall, f1
 
   def on_epoch_end(self, epoch, logs=None):
+        sys.stdout.flush()  # مهم عشان نضمن الترتيب
         print(f"\n--- Epoch {epoch+1} Metrics ---")
 
         # Training metrics
