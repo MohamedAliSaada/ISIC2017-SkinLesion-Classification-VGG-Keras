@@ -62,9 +62,7 @@ The project follows this workflow:
 | **Recall (Macro Avg)**    | 58.04%   | 62.72%      |
 | **F1-score (Macro Avg)**  | 63.20%   | **62.82%**  |
 
-### Visual Results
 
-![Training and Validation Results](results.png)
 
 Additional details and the trained model can be accessed on [Hugging Face](https://huggingface.co/saada2024/isic-2017).
 
@@ -75,9 +73,6 @@ Additional details and the trained model can be accessed on [Hugging Face](https
 - Class imbalance in the dataset may affect macro-averaged metrics.
 - Further hyperparameter tuning could improve stability.
 
-## Suggested Project Name
-
-**ISIC-2017 Lesion Classifier: VGG16 Fine-Tuned Approach**
 
 ## Future Improvements
 
